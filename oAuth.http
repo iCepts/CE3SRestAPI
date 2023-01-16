@@ -1,0 +1,202 @@
+
+@tenantId = 18b213c8-c059-4d15-b940-7bfda2825390
+@clientId = 79554cc4-a448-4b45-8ab5-54ea81c06b60
+#ClientName BC365API
+@clientSecret = DdU8Q~jWB1sCXgUPWB9tXBq~sgh1aEHFizyPNa7O
+
+@baseUri = https://api.businesscentral.dynamics.com
+@scope = {{baseUri}}/.default
+
+@bcEnvironmentName = MigrationSandbox
+
+@url = {{baseUri}}/v2.0/{{bcEnvironmentName}}/api/v2.0
+
+### items, customers, vendors
+@entityName =customers 
+
+#https://api.businesscentral.dynamics.com/v2.0/sandbox/api/v2.0/companies?$filter=name%20eq%20%27My%20Company%27
+@entityName = customers 
+
+# @name auth
+POST https://login.microsoftonline.com/{{tenantId}}/oauth2/v2.0/token HTTP/1.1
+Content-type: application/x-www-form-urlencoded
+
+grant_type=client_credentials
+&client_id={{clientId}}
+&client_secret={{clientSecret}}
+&scope={{scope}}
+
+
+#### Variable Response
+@accessHeader = Bearer {{auth.response.body.$.access_token}}
+
+### metadata ###
+GET {{baseurl}}/{{tenantId}}/{{environment}}/{{OData}}/$metadata
+Authorization: {{accessHeader}} 
+
+
+###?$filter=name eq 'My Company'
+# @name GetCompanies
+GET {{url}}/companies  HTTP/1.1
+Authorization: {{accessHeader}}
+
+#### Variable Response
+@companyId = {{GetCompanies.response.body.value.[0].id}}
+@companyUrl = {{url}}/companies({{companyId}})
+@displayName = MyItemDisplayName
+
+#https://api.businesscentral.dynamics.com/v2.0/18b213c8-c059-4d15-b940-7bfda2825390/MigrationSandbox/ODataV4/Company('CE3S')/LocationItemQty
+
+### items ###?$filter=contains(toupper(description),toupper('Porsche*')) &$skiptoken=230bf35d-87d4-ec11-b656-14cb655b35b5
+GET {{baseurl}}/{{tenantId}}/{{environment}}/api/{{APIPublisher}}/{{APIGroup}}/{{APIVersion}}/companies(4a7d223f-5ad4-ec11-8e7e-000d3a9cd1c0)/items?$select=no&$count=true
+Authorization: {{accessHeader}}
+
+### warehouse activity 
+GET {{baseurl}}/{{tenantId}}/{{environment}}/api/{{APIPublisher}}/{{APIGroup}}/{{APIVersion}}/companies(4a7d223f-5ad4-ec11-8e7e-000d3a9cd1c0)/warehouseActivityLines?$filter=sourceDocument eq 'Outbound Transfer'
+Authorization: {{accessHeader}}
+
+### binContent filter=gCrossReferenceType ne ' '
+GET {{baseurl}}/{{tenantId}}/{{environment}}/api/{{APIPublisher}}/{{APIGroup}}/{{APIVersion}}/companies(4a7d223f-5ad4-ec11-8e7e-000d3a9cd1c0)/binContents?$top=1000
+Authorization: {{accessHeader}}
+
+### salesInvoiceLines ###?$filter=contains(toupper(description),toupper('Porsche*'))$orderby=postingDate desc&$top=10&$=&$count=true
+GET {{baseurl}}/{{tenantId}}/{{environment}}/api/{{APIPublisher}}/{{APIGroup}}/{{APIVersion}}/companies(4a7d223f-5ad4-ec11-8e7e-000d3a9cd1c0)/salesInvoiceLines?$filter=postingDate ge 2021-01-01&$top=1000&$orderby=postingDate desc&$count=true
+Authorization: {{accessHeader}}
+
+### LocationItemQty oData4 Using oAuth 
+GET {{baseurl}}/{{tenantId}}/{{environment}}/{{OData}}/Company('CE3S')/LocationItemQty?$filter=Location_Code eq 'APR' & Location_Filter_FilterOnly='APR'   HTTP/1.1
+Authorization: Basic {{username}} {{password}}  
+
+###
+### EmployeeLocation 
+GET {{baseurl}}/{{tenantId}}/{{environment}}/{{OData}}/Company('CE3S')/EmployeeLocation   HTTP/1.1
+Authorization: {{accessHeader}}
+
+### PostedPackages Packing_Date gt 2022-08-1 and Shipping_Agent_Service eq 'YRK*'
+GET {{baseurl}}/{{tenantId}}/{{environment}}/{{OData}}/Company('CE3S')/PostedPackages?$filter=Packing_Date gt 2022-8-1 HTTP/1.1
+Authorization: {{accessHeader}}
+
+### PackTrakTransactions 
+GET {{baseurl}}/{{tenantId}}/{{environment}}/{{OData}}/Company('CE3S')/PackTrakTransactions?$filter=TransactionDateTime gt 2021-12-01T00:00:00Z  HTTP/1.1
+Authorization: {{accessHeader}}
+
+
+### itemLedgerEntries 
+GET {{baseurl}}/{{tenantId}}/{{environment}}//api/{{APIPublisher}}/{{APIGroup}}/{{APIVersion}}/companies(4a7d223f-5ad4-ec11-8e7e-000d3a9cd1c0)/itemLedgerEntries?$filter=postingDate gt 2021-12-1 and entryType eq 'Purchase'   HTTP/1.1
+Authorization: {{accessHeader}}
+
+### AlertCode ?$filter=SeqNo ge 32685
+GET {{baseurl}}/{{tenantId}}/{{environment}}/{{OData}}/Company('CE3S')/AlertCode  HTTP/1.1
+Authorization: {{accessHeader}}
+
+### InventoryTransaction&
+GET {{baseurl}}/{{tenantId}}/{{environment}}/{{OData}}/Company('CE3S')/InventoryTransaction?$top=100  HTTP/1.1
+Authorization: {{accessHeader}}
+
+### InventoryTransaction
+POST {{baseurl}}/{{tenantId}}/{{environment}}/{{OData}}/Company('CE3S')/InventoryTransaction
+Authorization: {{accessHeader}}
+Content-Type: application/json
+
+{
+"Location":"HR-1",
+"Item_No":"EX267A",
+"DeviceID":"RYAN",
+"Sequence":40,
+"Quantity":27,
+"QuantityUpdated":true,
+"DeptCode":"",
+"ActionDate":"2019-01-14T16:12:00Z",
+"CountType":"R",
+"RequestOrderQty":48,
+"BinMaxQty":0,
+"CountAdjustment":0,
+"Processed":false,
+"SO_No":"VM37004",
+"TransferOrder":"",
+"Error":false,
+"ErrorMessage":"",
+"CreatedTime":"0001-01-01T00:00:00Z",
+"RequestOrderQtyUpdated":true,
+"BinMaxQtyUpdated":false,
+"OverflowQty":0,
+"OverflowQtyUpdated":false,
+"LotSerial_No":"","RemoteInvQty":0,
+"RemoteInvQtyUpdated":false,
+"UserCode":""
+}
+
+### InventoryTransactionDetail
+GET {{baseurl}}/{{tenantId}}/{{environment}}/{{OData}}/Company('CE3S')/InventoryTransactionDetail?$top=1   HTTP/1.1
+Authorization: {{accessHeader}}
+
+### InventoryTransactionDetail
+POST {{baseurl}}/{{tenantId}}/{{environment}}/{{OData}}/Company('CE3S')/InventoryTransactionDetail
+Authorization: {{accessHeader}}
+Content-Type: application/json
+
+{
+    "Location":"MAU",
+    "Item_No":"LK12292",
+    "DeviceID":"DonTest",
+    "Sequence":2188,
+    "Quantity":3,
+    "LotSerial_No":"TEST1"
+}
+
+### InventoryProcessing
+POST {{baseurl}}/{{tenantId}}/{{environment}}/{{OData}}/ICPWebServices_InventoryProcessing?company=CE3S
+Authorization: {{accessHeader}}
+Content-Type: application/json
+
+{
+    "locationCode":"APR"
+}
+
+### SalesInvoiceLine oData4 Using oAuth 
+GET {{baseurl}}/{{tenantId}}/{{environment}}/{{OData}}/Company('CE3S')/SalesInvoiceLine?$filter=DocumentNo eq 'INP091286'  HTTP/1.1
+Authorization: {{accessHeader}} 
+
+
+### Item oData4 Using oAuth 
+GET {{baseurl}}/{{tenantId}}/{{environment}}/{{OData}}/Company('CE3S')/Item?$filter=No eq 'ZO9481'  HTTP/1.1
+Authorization: {{accessHeader}} 
+
+
+### @name GetEntities
+GET {{companyUrl}}/{{entityName}} HTTP/1.1
+Authorization: {{accessHeader}}
+
+
+
+### @name CreateEntity
+POST {{companyUrl}}/{{entityName}} HTTP/1.1
+Content-Type:  application/json
+Authorization: {{accessHeader}}
+
+{
+ "displayName" : "{{displayName}}"
+
+
+###
+# @name GetCreatedEntity
+GET {{companyUrl}}/{{entityName}}/?$filter=displayName eq '{{displayName}}' HTTP/1.1
+Authorization: {{accessHeader}}
+
+#### Variable Response
+@entityId = {{GetCreatedEntity.response.body.value.[0].id}}
+
+
+### @name ModifyEntity
+PATCH {{companyUrl}}/{{entityName}}({{entityId}})
+Authorization: {{accessHeader}}
+Content-Type:  application/json
+If-Match: *
+
+{
+    "displayName" : "DeleteMe-{{displayName}}"
+}
+
+### @name DeleteItem
+Delete {{companyUrl}}/{{entityName}}({{entityId}})
+Authorization: {{accessHeader}}

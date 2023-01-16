@@ -1,0 +1,27 @@
+{
+    "rest-client.previewOption": "exchange",
+    "rest-client.environmentVariables": {
+        "$shared": {},
+        "CloudSandbox": {
+            "username": "dsummers",
+            "password": "ct/95EI1U/jJh1+N9Mnaie29VBJ1gvI4S9rn0XTY/5g=",
+            "tenantId": "18b213c8-c059-4d15-b940-7bfda2825390",
+            "environment": "MigrationSandbox",
+            "baseurl": "https://api.businesscentral.dynamics.com/v2.0",
+            "api": "api/V2.0",
+            "OData": "ODataV4",
+            "notificationurl": "https://74.99.176.11:8083/BC365MVC/Subscription/Notification",
+            "APIPublisher": "ce3s",
+            "APIGroup": "webAPI",
+            "APIVersion": "v1.0",
+            "clientId": "79554cc4-a448-4b45-8ab5-54ea81c06b60",
+            "clientSecret": "DdU8Q~jWB1sCXgUPWB9tXBq~sgh1aEHFizyPNa7O",
+            "companyName": "'CRONUS USA, Inc.'"
+        }
+    }
+    //Client Name BC365API
+    // Adding Unchase OData Connected Service to the project failed: Failed to access the metadata document. 
+    //The OData service requires authentication for accessing it. 
+    //Please download the metadata, store it into a local file, and set the value of “MetadataDocumentUri” in the .odata.config file to the file path. 
+    //After that, run custom tool again to generate the OData Client code.
+}

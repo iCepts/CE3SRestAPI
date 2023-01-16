@@ -1,0 +1,48 @@
+# @name auth
+@baseUri = https://api.businesscentral.dynamics.com
+
+@scope = {{baseUri}}/.default
+POST https://login.microsoftonline.com/{{tenantId}}/oauth2/v2.0/token HTTP/1.1
+Content-type: application/x-www-form-urlencoded
+
+grant_type=client_credentials
+&client_id={{clientId}}
+&client_secret={{clientSecret}}
+&scope={{scope}}
+
+
+#### Variable Response
+@accessHeader = Bearer {{auth.response.body.$.access_token}}
+
+&scope={{scope}}
+###
+### https://api.businesscentral.dynamics.com/v2.0/production/api/v2.0/companies('CRONUS%20USA%2C%20Inc.')
+
+# @name GetCompanies
+GET {{baseurl}}/{{environment}}/{{api}}/companies HTTP/1.1
+Authorization: {{accessHeader}}
+
+#### Variable Response
+@companyId = {{GetCompanies.response.body.value.[0].id}}
+@companyName2 = {{GetCompanies.response.body.value.[0].name}}
+
+
+### Customer_Card Using oAuth 
+GET {{baseurl}}/{{tenantId}}/{{environment}}/{{OData}}/Company({{companyId}})/Customer HTTP/1.1
+Authorization: {{accessHeader}} 
+
+##
+### Customer_Card Using Basic Auth
+
+GET {{baseurl}}/{{tenantId}}/{{environment}}/{{OData}}/Company({{companyId}})/Customer_Card HTTP/1.1
+Authorization: Basic {{username}} {{password}} 
+
+##
+
+###
+### Customer Ship To's
+
+GET {{baseurl}}/{{tenantId}}/{{environment}}/{{OData}}/Company({{companyId}})/CustomerShipTos?$filter=Longitude%20ne%200  HTTP/1.1
+Authorization: Basic {{username}} {{password}} 
+
+##
